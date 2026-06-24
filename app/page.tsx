@@ -1,65 +1,259 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
+  const landing = {
+    heading: "Hi, I'm Your Name",
+    subheading: "Frontend Developer",
+    about_text:
+      "I am a Computer Science graduate focused on building responsive and user-friendly web applications.",
+    email: "your@email.com",
+    github_link: "https://github.com/yourusername",
+    github_username: "yourusername",
+    fb_link: "https://facebook.com/yourprofile",
+    facebook: "Facebook Profile",
+  };
+
+  const projects = [
+    {
+      id: 1,
+      project_title: "DOST Tourist Management System",
+      project_desc:
+        "A web-based system developed during my internship for managing tourist data and improving tourism operations.",
+      project_cat: "Next.js, Tailwind, API",
+    },
+    {
+      id: 2,
+      project_title: "Portfolio Website",
+      project_desc:
+        "Personal developer portfolio built using Next.js and Tailwind CSS.",
+      project_cat: "React, Next.js",
+    },
+    {
+      id: 3,
+      project_title: "Landing Page UI",
+      project_desc: "Responsive landing page design with modern UI principles.",
+      project_cat: "HTML, CSS, JS",
+    },
+  ];
+
+  const expertise = [
+    "HTML",
+    "CSS",
+    "JavaScript",
+    "React",
+    "Next.js",
+    "Tailwind",
+    "TypeScript",
+    "Git",
+  ];
+
+  const resume = {
+    filename: "resume.pdf",
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <>
+    <div className="p-6 min-h-screen bg-[var(--background)] text-[var(--foreground)]">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 max-w-[900px] mx-auto">
+        {/* HERO */}
+        <div
+          className="md:col-span-7 row-span-2 min-h-[300px] flex flex-col relative rounded-3xl p-6
+          bg-[var(--glass)] border border-[var(--glass-border)] backdrop-blur-[18px]"
+            >
+          <div className="flex items-center gap-2 mb-5">
+            <Link href="/admin">
+              <span className="block w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse shadow-[0_0_10px_var(--accent)]" />
+            </Link>
+            
+            <span className="text-xs uppercase tracking-widest text-[var(--text-muted)]">
+              Online
+            </span>
+
+            <Link
+              href="/about"
+              className="ml-auto w-11 h-11 rounded-full flex items-center justify-center
+          bg-[var(--accent)]/20 border border-[var(--glass-border)] text-[var(--accent)] font-bold"
+            >
+              Y
+            </Link>
+          </div>
+
+          <h1 className="text-4xl font-bold leading-tight">
+            {landing.heading}
+            <br />
+            <span className="text-xl text-[var(--text-muted)] italic">
+              {landing.subheading}
+            </span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <p className="mt-auto pt-5 text-sm text-[var(--text-soft)] max-w-[340px] leading-relaxed">
+            {landing.about_text}
           </p>
+
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {/* STATUS */}
+        <div
+          className="md:col-span-5 p-6 rounded-3xl
+      bg-[var(--glass)] border border-[var(--glass-border)]"
+        >
+          <p className="text-xs uppercase text-[var(--text-muted)]">Based in</p>
+
+          <h2 className="text-xl font-bold mt-1">🇵🇭 Philippines</h2>
+
+          <div
+            className="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full
+        bg-[var(--accent)]/20 border border-[var(--glass-border)] text-[var(--accent)] text-xs"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
+            <div className="w-1.5 h-1.5 bg-[var(--accent)] rounded-full" />
+            Open to remote work
+          </div>
+        </div>
+
+        {/* CONTACT */}
+        <div
+          className="md:col-span-5 p-6 rounded-3xl
+      bg-[var(--glass)] border border-[var(--glass-border)]"
+        >
+          <p className="text-xs uppercase text-[var(--text-muted)]">
+            Get in touch
+          </p>
+
+          <div className="flex flex-col gap-2 mt-3 text-sm text-[var(--text-soft)]">
+            <a
+              href={`https://mail.google.com/mail/?view=cm&to=${landing.email}`}
+              target="_blank"
+              className="hover:text-[var(--accent)] transition"
+            >
+              📧 {landing.email}
+            </a>
+
+            <a
+              href={landing.github_link}
+              target="_blank"
+              className="hover:text-[var(--accent)] transition"
+            >
+              💻 {landing.github_username}
+            </a>
+
+            <a
+              href={landing.fb_link}
+              target="_blank"
+              className="hover:text-[var(--accent)] transition"
+            >
+              📘 {landing.facebook}
+            </a>
+          </div>
+        </div>
+
+        {/* PROJECTS */}
+        <div
+          className="md:col-span-12 p-6 rounded-3xl
+      bg-[var(--glass)] border border-[var(--glass-border)]"
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xs uppercase text-[var(--text-muted)]">
+              Projects
+            </h3>
+
+            <Link href="/projectslist" className="text-[var(--accent)]">
+              ↗
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {projects.map((project, i) => (
+              <Link
+                key={project.id}
+                href={`/projects/${project.id}`}
+                className="p-4 rounded-xl bg-[var(--surface)]
+            border border-[var(--glass-border)]
+            hover:border-[var(--glass-border-hover)]
+            hover:bg-[var(--accent)]/10 transition"
+              >
+                <p className="text-[var(--accent)] text-xs font-bold">
+                  0{i + 1}
+                </p>
+
+                <h4 className="font-bold text-sm mt-1 text-[var(--foreground)]">
+                  {project.project_title}
+                </h4>
+
+                <p className="text-xs text-[var(--text-soft)] mt-1 line-clamp-2">
+                  {project.project_desc}
+                </p>
+
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {project.project_cat.split(",").map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="text-[10px] px-2 py-[2px] rounded
+                  bg-[var(--tag-bg)] text-[var(--tag-text)]"
+                    >
+                      {tag.trim()}
+                    </span>
+                  ))}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* TECH STACK */}
+        <div
+          className="md:col-span-6 p-6 rounded-3xl
+      bg-[var(--glass)] border border-[var(--glass-border)]"
+        >
+          <h3 className="text-xs uppercase text-[var(--text-muted)]">
+            Tech Stack
+          </h3>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3">
+            {expertise.map((skill, i) => (
+              <div
+                key={i}
+                className="p-2 text-xs text-center rounded-xl
+            bg-[var(--surface)]
+            border border-[var(--glass-border)]
+            text-[var(--text-soft)]
+            hover:bg-[var(--accent)]/10 hover:text-[var(--accent)] transition"
+              >
+                {skill}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div
+          className="md:col-span-6 p-6 rounded-3xl
+      bg-[var(--accent)]/20 border border-[var(--glass-border)]
+      flex flex-col justify-between"
+        >
+          <div>
+            <div className="w-10 h-1 bg-[var(--accent)] rounded mb-3" />
+
+            <h2 className="text-xl font-bold text-[var(--foreground)]">
+              Let&apos;s build something.
+            </h2>
+
+            <p className="text-sm text-[var(--text-soft)]">
+              Open for opportunities.
+            </p>
+          </div>
+
           <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`/uploads/${resume.filename}`}
+            className="mt-4 px-5 py-2 rounded-full
+        bg-[var(--accent)]
+        hover:bg-[var(--accent)]/80
+        transition text-sm font-semibold text-center text-white"
           >
-            Documentation
+            Download Resume ↓
           </a>
         </div>
-      </main>
+      </div>
     </div>
+    </>
   );
 }
