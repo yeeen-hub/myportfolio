@@ -73,7 +73,7 @@ export default function Home() {
           bg-[var(--glass)] border border-[var(--glass-border)] backdrop-blur-[18px]"
           >
             <div className="flex items-center gap-2 mb-5">
-              <Link href="/admin">
+              <Link href="/login">
                 <span className="block w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse shadow-[0_0_10px_var(--accent)]" />
               </Link>
 

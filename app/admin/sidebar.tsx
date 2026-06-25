@@ -2,9 +2,23 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  async function handleSignOut() {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error("Sign out error:", error);
+      return;
+    }
+
+    router.replace("/login");
+  }
 
   return (
     <>
@@ -99,13 +113,13 @@ export default function Sidebar() {
 
         {/* FOOTER */}
         <div className="p-4 border-t border-[var(--border)]">
-          <Link
-            href="/logout"
-            className="block text-center px-4 py-2 rounded
-            bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
-          >
-            Sign Out
-          </Link>
+          <button
+          onClick={handleSignOut}
+          className="w-full text-center px-4 py-2 rounded
+          bg-red-500/10 text-red-400 hover:bg-red-500/20 transition"
+        >
+          Sign Out
+        </button>
         </div>
       </aside>
     </>
