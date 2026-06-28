@@ -17,7 +17,7 @@ export default function Sidebar() {
       return;
     }
 
-    router.replace("/login");
+    router.replace("/");
   }
 
   return (

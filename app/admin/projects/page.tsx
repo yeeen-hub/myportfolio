@@ -13,8 +13,11 @@ export default function ProjectsPage() {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
+  const [link, setLink] = useState("");
+  const [existingMedia, setExistingMedia] = useState<any[]>([]);
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaIndexes, setMediaIndexes] = useState<{
-  [key: number]: number;
+    [key: number]: number;
   }>({});
 
   async function fetchProjects() {
@@ -51,7 +54,9 @@ export default function ProjectsPage() {
     setEditingId(null);
     setTitle("");
     setCategory("");
+    setLink("");
     setDescription("");
+    setMediaFiles([]);
     setOpen(true);
   }
 
@@ -59,7 +64,10 @@ export default function ProjectsPage() {
     setEditingId(project.id);
     setTitle(project.title || "");
     setCategory(project.category || "");
+    setLink(project.link || "");
     setDescription(project.description || "");
+    setExistingMedia(project.project_media || []);
+    setMediaFiles([]);
     setOpen(true);
   }
 
@@ -79,11 +87,29 @@ export default function ProjectsPage() {
     }
   }
 
+  async function removeMedia(media: any) {
+    if (!confirm("Remove this media?")) return;
+
+    const { error } = await supabase
+      .from("project_media")
+      .delete()
+      .eq("id", media.id);
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setExistingMedia((prev) => prev.filter((item) => item.id !== media.id));
+  }
+
   async function handleSave() {
     if (!title.trim()) {
       alert("Title is required");
       return;
     }
+
+    let projectId = editingId;
 
     if (editingId) {
       const { error } = await supabase
@@ -92,6 +118,7 @@ export default function ProjectsPage() {
           title,
           category,
           description,
+          link,
         })
         .eq("id", editingId);
 
@@ -100,17 +127,63 @@ export default function ProjectsPage() {
         return;
       }
     } else {
-      const { error } = await supabase.from("projects").insert({
-        title,
-        category,
-        description,
-      });
+      const { data: project, error } = await supabase
+        .from("projects")
+        .insert({
+          title,
+          category,
+          description,
+          link,
+        })
+        .select()
+        .single();
 
       if (error) {
         console.error(error);
         return;
       }
+
+      projectId = project.id;
     }
+
+    // Upload media for both NEW and EDIT modes
+    if (mediaFiles.length > 0 && projectId) {
+      for (const file of mediaFiles) {
+        const fileName = `${Date.now()}-${file.name}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("project-media")
+          .upload(fileName, file);
+
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          continue;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from("project-media")
+          .getPublicUrl(fileName);
+
+        const { error: mediaError } = await supabase
+          .from("project_media")
+          .insert({
+            project_id: projectId,
+            type: file.type.startsWith("video") ? "video" : "image",
+            src: publicUrlData.publicUrl,
+          });
+
+        if (mediaError) {
+          console.error("Media insert error:", mediaError);
+        }
+      }
+    }
+
+    setMediaFiles([]);
+    setEditingId(null);
+    setTitle("");
+    setCategory("");
+    setDescription("");
+    setLink("");
 
     setOpen(false);
     fetchProjects();
@@ -162,7 +235,6 @@ export default function ProjectsPage() {
             >
               {/* LEFT SIDE */}
               <div className="flex gap-4 flex-1">
-                {/* MEDIA PREVIEW */}
                 {/* MEDIA PREVIEW */}
                 <div className="relative w-32 h-24 rounded-lg overflow-hidden border border-[var(--border)] bg-[var(--surface)] flex-shrink-0">
                   {project.project_media?.length ? (
@@ -299,6 +371,13 @@ export default function ProjectsPage() {
                 className="w-full px-3 py-2 rounded bg-[var(--surface)] border border-[var(--border)]"
               />
 
+              <input
+                value={link}
+                onChange={(e) => setLink(e.target.value)}
+                placeholder="Link"
+                className="w-full px-3 py-2 rounded bg-[var(--surface)] border border-[var(--border)]"
+              />
+
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -306,6 +385,58 @@ export default function ProjectsPage() {
                 rows={5}
                 className="w-full px-3 py-2 rounded bg-[var(--surface)] border border-[var(--border)]"
               />
+            </div>
+
+            <div>
+              <label className="block mb-2 font-medium">Project Media</label>
+
+              {existingMedia.length > 0 && (
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                  {existingMedia.map((media) => (
+                    <div
+                      key={media.id}
+                      className="relative border border-[var(--border)] rounded overflow-hidden"
+                    >
+                      {media.type === "video" ? (
+                        <video
+                          src={media.src}
+                          className="w-full h-24 object-cover"
+                        />
+                      ) : (
+                        <img
+                          src={media.src}
+                          alt=""
+                          className="w-full h-24 object-cover"
+                        />
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => removeMedia(media)}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded px-2 py-1 text-xs"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <input
+                type="file"
+                multiple
+                accept="image/*,video/*"
+                onChange={(e) =>
+                  setMediaFiles(Array.from(e.target.files || []))
+                }
+                className="w-full px-3 py-2 rounded bg-[var(--surface)] border border-[var(--border)]"
+              />
+
+              {mediaFiles.length > 0 && (
+                <div className="mt-2 text-sm text-gray-400">
+                  {mediaFiles.length} new file(s) selected
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-2 mt-4">
