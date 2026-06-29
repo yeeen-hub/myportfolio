@@ -20,6 +20,11 @@ export default function ProjectsPage() {
     [key: number]: number;
   }>({});
 
+  const [allSkills, setAllSkills] = useState<any[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<any[]>([]);
+  const [skillSearch, setSkillSearch] = useState("");
+  const [showSkillDropdown, setShowSkillDropdown] = useState(false);
+
   async function fetchProjects() {
     setLoading(true);
 
@@ -57,10 +62,12 @@ export default function ProjectsPage() {
     setLink("");
     setDescription("");
     setMediaFiles([]);
+    setSelectedSkills([]);
+    fetchSkills();
     setOpen(true);
   }
 
-  function openEditModal(project: any) {
+  async function openEditModal(project: any) {
     setEditingId(project.id);
     setTitle(project.title || "");
     setCategory(project.category || "");
@@ -68,6 +75,30 @@ export default function ProjectsPage() {
     setDescription(project.description || "");
     setExistingMedia(project.project_media || []);
     setMediaFiles([]);
+
+    await fetchSkills();
+
+    const { data: projectSkills, error } = await supabase
+      .from("project_skills")
+      .select(
+        `
+      skill_id,
+      skills (
+        id,
+        skill_name
+      )
+    `,
+      )
+      .eq("project_id", project.id);
+
+    if (error) {
+      console.error(error);
+    } else {
+      setSelectedSkills(
+        projectSkills?.map((item: any) => item.skills).filter(Boolean) || [],
+      );
+    }
+
     setOpen(true);
   }
 
@@ -101,6 +132,20 @@ export default function ProjectsPage() {
     }
 
     setExistingMedia((prev) => prev.filter((item) => item.id !== media.id));
+  }
+
+  async function fetchSkills() {
+    const { data, error } = await supabase
+      .from("skills")
+      .select("*")
+      .order("skill_name");
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setAllSkills(data || []);
   }
 
   async function handleSave() {
@@ -178,13 +223,41 @@ export default function ProjectsPage() {
       }
     }
 
+    if (projectId) {
+      const { error: deleteError } = await supabase
+        .from("project_skills")
+        .delete()
+        .eq("project_id", projectId);
+
+      if (deleteError) {
+        console.error(deleteError);
+        return;
+      }
+
+      if (selectedSkills.length > 0) {
+        const rows = selectedSkills.map((skill) => ({
+          project_id: projectId,
+          skill_id: skill.id,
+        }));
+
+        const { error: skillError } = await supabase
+          .from("project_skills")
+          .insert(rows);
+
+        if (skillError) {
+          console.error(skillError);
+          return;
+        }
+      }
+    }
+
     setMediaFiles([]);
     setEditingId(null);
     setTitle("");
     setCategory("");
     setDescription("");
     setLink("");
-
+    setSelectedSkills([]);
     setOpen(false);
     fetchProjects();
   }
@@ -349,7 +422,18 @@ export default function ProjectsPage() {
       {/* MODAL */}
       {open && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
-          <div className="w-full max-w-lg rounded-xl bg-[var(--background)] border border-[var(--border)] p-6">
+  <div
+    className="
+      w-full max-w-lg
+      max-h-[90vh]
+      overflow-y-auto
+      hide-scrollbar
+      rounded-xl
+      bg-[var(--bg-base)]
+      border border-[var(--border)]
+      p-6
+    "
+  >
             <div className="flex justify-between items-center mb-4">
               <h2 className="font-bold text-lg">
                 {editingId ? "Edit Project" : "New Project"}
@@ -385,6 +469,77 @@ export default function ProjectsPage() {
                 rows={5}
                 className="w-full px-3 py-2 rounded bg-[var(--surface)] border border-[var(--border)]"
               />
+
+              <div className="relative">
+                <input
+                  value={skillSearch}
+                  onChange={(e) => setSkillSearch(e.target.value)}
+                  onFocus={() => setShowSkillDropdown(true)}
+                  placeholder="Search skill..."
+                  className="w-full px-3 py-2 rounded bg-[var(--surface)] border border-[var(--border)]"
+                />
+
+                {showSkillDropdown && (
+                  <div
+                    className="
+                      absolute z-50 mt-1 w-full
+                      rounded border border-[var(--border)]
+                      bg-[var(--surface)]/80 backdrop-blur text-[var(--text-muted)]
+                      max-h-48 overflow-y-auto
+                    "
+                  >
+                    {allSkills
+                      .filter(
+                        (skill) =>
+                          skill.skill_name
+                            .toLowerCase()
+                            .includes(skillSearch.toLowerCase()) &&
+                          !selectedSkills.some((s) => s.id === skill.id),
+                      )
+                      .map((skill) => (
+                        <button
+                          key={skill.id}
+                          type="button"
+                          className="block w-full text-left px-3 py-2 hover:bg-[var(--accent)]/10"
+                          onClick={() => {
+                            setSelectedSkills((prev) => [...prev, skill]);
+                            setSkillSearch("");
+                            setShowSkillDropdown(false);
+                          }}
+                        >
+                          {skill.skill_name}
+                        </button>
+                      ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-2 mt-3">
+                {selectedSkills.map((skill) => (
+                  <div
+                    key={skill.id}
+                    className="
+                    inline-flex items-center gap-2
+                    px-3 py-1 rounded-full
+                    bg-[var(--accent)]/15
+                    border border-[var(--glass-border)]
+                  "
+                  >
+                    <span>{skill.skill_name}</span>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedSkills((prev) =>
+                          prev.filter((s) => s.id !== skill.id),
+                        )
+                      }
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div>
