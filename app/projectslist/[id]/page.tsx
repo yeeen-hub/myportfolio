@@ -90,18 +90,18 @@ export default function ProjectPage() {
       <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-10 items-center bg-[var(--glass)] border border-[var(--glass-border)] rounded-3xl p-6">
         {/* LEFT: MEDIA VIEWER */}
         <div className="relative bg-[var(--surface)] rounded-xl overflow-hidden border border-[var(--border)]">
-          <div className="w-full h-[350px] md:h-[450px] flex items-center justify-center bg-black">
+          <div className="w-full min-h-[350px] md:min-h-[450px] flex items-center justify-center bg-black p-4">
             {!current ? (
               <p className="text-white">No media available</p>
             ) : current.type === "image" ? (
               <img
                 src={current.src}
                 alt={project.title}
-                className="w-full h-full object-cover"
+                className="max-w-full max-h-[80vh] object-contain"
               />
             ) : (
               <iframe
-                className="w-full h-full"
+                className="h-full aspect-video rounded-lg"
                 src={current.src}
                 title="Project Video"
                 allowFullScreen
@@ -138,10 +138,10 @@ export default function ProjectPage() {
             {project.link && (
               <a
                 href={
-    project.link?.startsWith("http")
-      ? project.link
-      : `https://${project.link}`
-  }
+                  project.link?.startsWith("http")
+                    ? project.link
+                    : `https://${project.link}`
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[var(--accent)] border border-[var(--glass-border)] p-2 rounded-lg hover:bg-[var(--accent)]/10 transition"
