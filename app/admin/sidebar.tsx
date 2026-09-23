@@ -3,7 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/client";
+
+const supabase = createClient();
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
@@ -18,6 +20,7 @@ export default function Sidebar() {
     }
 
     router.replace("/");
+    router.refresh();
   }
 
   return (
